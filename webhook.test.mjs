@@ -1,0 +1,16 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {createHmac} from 'node:crypto';
+import {createReceiver} from './webhook.mjs';
+const secret='test-only-secret';
+const body=Buffer.from('{"action":"push"}');
+const signature=bytes=>'sha256='+createHmac('sha256',secret).update(bytes).digest('hex');
+const request=(deliveryId='one',rawBody=body)=>({deliveryId,rawBody,signature:signature(rawBody)});
+test('exact raw bytes are authenticated and parsed',async()=>{let received;const handle=createReceiver({secret,onEvent:e=>{received=e;}});assert.equal((await handle(request())).status,200);assert.deepEqual(received,{action:'push'});});
+test('wrong or malformed signatures never execute callback',async()=>{let calls=0;const handle=createReceiver({secret,onEvent:()=>calls++});assert.equal((await handle({...request(),signature:'sha256='+'0'.repeat(64)})).status,401);assert.equal((await handle({...request(),signature:'invalid'})).status,401);assert.equal(calls,0);});
+test('duplicates are successful without duplicate processing',async()=>{let calls=0;const handle=createReceiver({secret,onEvent:()=>calls++});assert.equal((await handle(request())).duplicate,false);assert.deepEqual(await handle(request()),{status:200,duplicate:true});assert.equal(calls,1);});
+test('conflicting payload reuse is refused',async()=>{const handle=createReceiver({secret,onEvent:()=>{}});await handle(request());assert.equal((await handle(request('one',Buffer.from('{"action":"delete"}')))).status,409);});
+test('failed processing is retryable',async()=>{let calls=0;const handle=createReceiver({secret,onEvent:()=>{if(calls++===0)throw new Error('temporary');}});assert.equal((await handle(request())).status,503);assert.equal((await handle(request())).status,200);assert.equal(calls,2);});
+test('concurrent duplicate reports pending without a second callback',async()=>{let finish;let calls=0;const handle=createReceiver({secret,onEvent:()=>{calls++;return new Promise(resolve=>{finish=resolve;});}});const pending=handle(request());assert.deepEqual(await handle(request()),{status:202,duplicate:true});finish();await pending;assert.equal(calls,1);});
+test('authenticated malformed JSON gets a useful failure',async()=>{const handle=createReceiver({secret,onEvent:()=>assert.fail()});assert.equal((await handle(request('bad',Buffer.from('{')))).status,400);});
+test('bounded retention permits reprocessing after eviction',async()=>{let calls=0;const handle=createReceiver({secret,maxDeliveries:1,onEvent:()=>calls++});await handle(request('one'));await handle(request('two'));await handle(request('one'));assert.equal(calls,3);});

@@ -1,0 +1,18 @@
+Runner: node@sha256:6f7b03f7c2c8e2e784dcf9295400527b9b1270fd37b7e9a7285cf83b6951452d
+Isolation: no network; read-only; unprivileged; no credentials
+✔ exact raw bytes are authenticated and parsed (9.374855ms)
+✔ wrong or malformed signatures never execute callback (0.595843ms)
+✔ duplicates are successful without duplicate processing (1.149417ms)
+✔ conflicting payload reuse is refused (0.473627ms)
+✔ failed processing is retryable (0.883485ms)
+✔ concurrent duplicate reports pending without a second callback (0.829317ms)
+✔ authenticated malformed JSON gets a useful failure (0.492727ms)
+✔ bounded retention permits reprocessing after eviction (3.015121ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 225.00487
