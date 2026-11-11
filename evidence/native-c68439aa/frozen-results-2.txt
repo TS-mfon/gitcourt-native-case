@@ -1,0 +1,59 @@
+TAP version 13
+# Subtest: exact raw bytes are authenticated and parsed
+ok 1 - exact raw bytes are authenticated and parsed
+  ---
+  duration_ms: 4.06476
+  type: 'test'
+  ...
+# Subtest: wrong or malformed signatures never execute callback
+ok 2 - wrong or malformed signatures never execute callback
+  ---
+  duration_ms: 0.49923
+  type: 'test'
+  ...
+# Subtest: duplicates are successful without duplicate processing
+ok 3 - duplicates are successful without duplicate processing
+  ---
+  duration_ms: 0.7272
+  type: 'test'
+  ...
+# Subtest: conflicting payload reuse is refused
+ok 4 - conflicting payload reuse is refused
+  ---
+  duration_ms: 0.43038
+  type: 'test'
+  ...
+# Subtest: failed processing is retryable
+ok 5 - failed processing is retryable
+  ---
+  duration_ms: 0.92853
+  type: 'test'
+  ...
+# Subtest: concurrent duplicate reports pending without a second callback
+ok 6 - concurrent duplicate reports pending without a second callback
+  ---
+  duration_ms: 0.62145
+  type: 'test'
+  ...
+# Subtest: authenticated malformed JSON gets a useful failure
+ok 7 - authenticated malformed JSON gets a useful failure
+  ---
+  duration_ms: 0.38106
+  type: 'test'
+  ...
+# Subtest: bounded retention permits reprocessing after eviction
+ok 8 - bounded retention permits reprocessing after eviction
+  ---
+  duration_ms: 1.93446
+  type: 'test'
+  ...
+1..8
+# tests 8
+# suites 0
+# pass 8
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 175.91913
+
